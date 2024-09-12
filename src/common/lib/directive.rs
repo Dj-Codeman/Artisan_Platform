@@ -10,13 +10,16 @@ use walkdir::WalkDir;
 // The directive functions will parse dependencies or programs that need to be ran when new data is pulled down.
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Directive {
+    // pub version: crate::version::Version,
     pub url: String,
+    pub track_directory: bool, // Triggering service restart if dir changes
     pub apache: bool, // This will determine if a new apache config is needed
     pub port: u16,
     pub php_fpm_version: Option<String>, // Add this field to specify PHP-FPM version
     pub nodejs_bool: bool,
     pub nodejs_version: Option<String>,
-    // pub nodejs_exec_command: Option<String>, // This field will change what is written to the service file
+    pub nodejs_exec_command: Option<String>, // This field will change what is written to the service file
+    pub nodejs_pre_exec_command: Option<String>, // This field will change what is written to the service file
     pub directive_executed: bool, // This should never be changed
 }
 

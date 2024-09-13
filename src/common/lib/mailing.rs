@@ -1,5 +1,5 @@
 use crate::dusa_wrapper::encrypt_text;
-use dusa_collection_utils::errors::{ErrorArrayItem, Errors};
+use dusa_collection_utils::{errors::{ErrorArrayItem, Errors}, stringy::Stringy};
 use serde::{Deserialize, Serialize};
 use std::{fmt, io::Write, net::TcpStream};
 
@@ -16,7 +16,7 @@ pub struct Email {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmailSecure {
     /// The encrypted email data.
-    pub data: String,
+    pub data: Stringy,
 }
 
 // Display implementations
@@ -55,7 +55,7 @@ impl EmailSecure {
         }
 
         let plain_email_data: String = format!("{}-=-{}", email.subject, email.body);
-        let encrypted_data: String = encrypt_text(plain_email_data)?;
+        let encrypted_data: Stringy = encrypt_text(plain_email_data)?;
 
         Ok(EmailSecure {
             data: encrypted_data,

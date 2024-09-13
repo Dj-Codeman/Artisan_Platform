@@ -21,13 +21,13 @@ pub fn create_apache_config(
     base_path: &Path,
 ) -> Result<bool, ErrorArrayItem> {
     let php_fpm_config = match &directive.php_fpm_version {
-        Some(version) if version == "7.4" => {
+        Some(version) if &*version.as_arc_str() == "7.4" => {
             r#"SetHandler "proxy:unix:/var/run/php/php7.4-fpm.sock|fcgi://localhost/""#
         }
-        Some(version) if version == "8.1" => {
+        Some(version) if &*version.as_arc_str() == "8.1" => {
             r#"SetHandler "proxy:unix:/var/run/php/php8.1-fpm.sock|fcgi://localhost/""#
         }
-        Some(version) if version == "8.2" => {
+        Some(version) if &*version.as_arc_str() == "8.2" => {
             r#"SetHandler "proxy:unix:/var/run/php/php8.2-fpm.sock|fcgi://localhost/""#
         }
         _ => "", // No PHP-FPM handler if version is not specified or not recognized
@@ -91,8 +91,8 @@ pub async fn reload_apache() -> Result<bool, ErrorArrayItem> {
 }
 
 pub async fn process_directives(base_path: &str) -> Result<bool, ErrorArrayItem> {
-    let directive_paths = scan_directories(base_path).await?;
-    let mut config_changed = false;
+    let directive_paths: Vec<dusa_collection_utils::types::PathType> = scan_directories(base_path).await?;
+    let mut config_changed: bool = false;
 
     for directive_path in directive_paths {
         match parse_directive(&directive_path).await {
@@ -114,51 +114,3 @@ pub async fn process_directives(base_path: &str) -> Result<bool, ErrorArrayItem>
 
     Ok(config_changed)
 }
-
-// #[tokio::main]
-// async fn main() -> Result<(), Box<dyn Error>> {
-//     let base_path = "/var/www/ais"; // Adjust as necessary
-
-//     loop {
-//         match process_directives(base_path).await {
-//             Ok(config_changed) => {
-//                 if config_changed {
-//                     match reload_apache().await {
-//                         Ok(b) => {
-//                             if !b {
-//                                 eprintln!("My god we killed apache, quick email the admin");
-//                                 eprintln!("The apache config we rolled out most likely killed apache");
-//                             }
-//                         }
-//                         Err(e) => ErrorArray::new(vec![e]).display(false),
-//                     }
-//                 }
-//                 // report to the aggregator
-//                 let status = Status {
-//                     app_name: AppName::Apache,
-//                     app_status: AppStatus::Running,
-//                     timestamp: current_timestamp(),
-//                     version: Version::get(),
-//                 };
-//                 if let Err(err) = report_status(status).await {
-//                     ErrorArray::new(vec![err]).display(false);
-//                 }
-//             }
-//             Err(e) => {
-//                 eprintln!("Error processing directives: {}", e);
-//                 // report to the aggregator
-//                 let status = Status {
-//                     app_name: AppName::Apache,
-//                     app_status: AppStatus::Warning,
-//                     timestamp: current_timestamp(),
-//                     version: Version::get(),
-//                 };
-
-//                 if let Err(err) = report_status(status).await {
-//                     ErrorArray::new(vec![err]).display(false);
-//                 }
-//             }
-//         }
-//         time::sleep(Duration::from_secs(10)).await; // Adjust the interval as needed
-//     }
-// }

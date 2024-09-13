@@ -19,7 +19,8 @@ pub struct GitAuth {
     pub user: Stringy,
     pub repo: Stringy,
     pub branch: Stringy,
-    pub token: Stringy,
+    // TODO deping the token string, It never functioned as intended
+    // pub token: Stringy,
 }
 
 // TODO ensure we are creating an Array of GitAuth items to parse in loops

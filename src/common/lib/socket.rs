@@ -1,4 +1,4 @@
-use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf};
+use std::{fs, os::unix::fs::PermissionsExt};
 
 use dusa_collection_utils::{
     errors::{
@@ -60,8 +60,8 @@ pub fn get_socket_path(
     }))
 }
 
-pub fn set_socket_ownership(path: &PathBuf, uid: Uid, gid: Gid) -> Result<(), ErrorArrayItem> {
-    if let Err(err) = chown(path, Some(uid), Some(gid)) {
+pub fn set_socket_ownership(path: &PathType, uid: Uid, gid: Gid) -> Result<(), ErrorArrayItem> {
+    if let Err(err) = chown(&path.to_path_buf(), Some(uid), Some(gid)) {
         return Err(ErrorArrayItem::from(err));
     };
 

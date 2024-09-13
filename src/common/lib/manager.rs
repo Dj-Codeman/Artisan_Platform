@@ -1,11 +1,12 @@
 use std::fmt;
 
+use dusa_collection_utils::stringy::Stringy;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NetworkRequest {
     pub request_type: NetworkRequestType,
-    pub data: Option<String>,
+    pub data: Option<Stringy>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -18,8 +19,8 @@ pub enum NetworkRequestType {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct NetworkResponse {
-    pub status: String,
-    pub data: Option<String>,
+    pub status: Stringy,
+    pub data: Option<Stringy>,
 }
 
 impl fmt::Display for NetworkResponse {

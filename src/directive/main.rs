@@ -14,9 +14,7 @@ use ais_common::{
     version::Version,
 };
 use dusa_collection_utils::{
-    errors::{ErrorArray, ErrorArrayItem},
-    functions::{create_hash, make_file, open_file, truncate},
-    types::{ClonePath, PathType},
+    errors::{ErrorArray, ErrorArrayItem}, functions::{create_hash, make_file, open_file, truncate}, stringy::Stringy, types::{ClonePath, PathType}
 };
 use simple_pretty::{notice, warn};
 use std::{
@@ -136,7 +134,7 @@ async fn executing_directive(directive_path: PathType) -> Result<(), ErrorArrayI
     if directive.nodejs_bool {
         let _version = match directive.nodejs_version {
             Some(d) => d,
-            None => String::from("22"),
+            None => Stringy::from("22"),
         };
 
         // TODO add check with nvm to ensure the correct version is installed.
@@ -233,8 +231,7 @@ async fn main() {
             }
         };
 
-        for directive_path_string in directive_paths {
-            let directive_path: PathType = PathType::PathBuf(directive_path_string);
+        for directive_path in directive_paths {
 
             // If we haven't already stored the directive data
             if !check_directive(directive_path.clone())

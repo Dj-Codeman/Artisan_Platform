@@ -90,8 +90,8 @@ impl Version {
         }
     }
 
-    pub fn comp(data: String) -> bool {
-        let version = match Self::from_string(data) {
+    pub fn comp(data: Stringy) -> bool {
+        let version = match Self::from_stringy(data) {
             Some(d) => d,
             None => return false,
         };

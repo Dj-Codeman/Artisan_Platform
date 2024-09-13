@@ -1,18 +1,19 @@
 use std::fmt;
 
+use dusa_collection_utils::stringy::Stringy;
 use serde::{Deserialize, Serialize};
 
 /// Current version of the protocol, derived from the package version.
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-#[derive(Debug, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize, Clone)]
 pub struct Version {
-    pub number: &'static str,
+    pub number: Stringy,
     pub code: AisCode,
 }
 
 /// Enumeration representing different version codes.
-#[derive(Debug, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize, Clone)]
 pub enum AisCode {
     /// Production version.
     Production,
@@ -50,8 +51,9 @@ impl fmt::Display for Version {
 impl Version {
     /// Get the current version of the ais platform as a filled struct
     pub fn get_raw() -> Self {
+        let version: Stringy = VERSION.into();
         Version {
-            number: &VERSION,
+            number: version,
             code: AisCode::ProductionCandidate,
         }
     }
@@ -117,7 +119,7 @@ impl Version {
                 _ => return None,
             };
             // Convert the string to a 'static str
-            let number_static = Box::leak(number.to_string().into_boxed_str());
+            let number_static: Stringy = number.into();
             Some(Version {
                 number: number_static,
                 code,

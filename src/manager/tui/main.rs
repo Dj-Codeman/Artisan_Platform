@@ -372,11 +372,11 @@ fn handle_git_repo_update(
     // Send the updated git credentials to the server
     let request: NetworkRequest = NetworkRequest {
         request_type: NetworkRequestType::UPDATEGITREPO,
-        data: Some(serde_json::to_string(&git_vec).unwrap()),
+        data: Some(serde_json::to_string(&git_vec).unwrap().into()),
     };
 
     if let Ok(response) = send_request(ip_address, &request) {
-        if response.status == "OK" {
+        if response.status == "OK".into() {
             let mut messages_lock = messages.lock().unwrap();
             messages_lock.insert(
                 "GitUpdate".to_string(),

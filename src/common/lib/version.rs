@@ -59,9 +59,9 @@ impl Version {
     }
 
     /// Get the current version String
-    pub fn get() -> String {
+    pub fn get() -> Stringy {
         let data = Self::get_raw();
-        data.to_string()
+        data.to_string().into()
     }
 
     /// Checks if a version number given is compatible with the current version
@@ -101,6 +101,14 @@ impl Version {
     pub fn to_string(self) -> String {
         let data = self;
         format!("{}{}", data.number, data.code)
+    }
+
+    pub fn to_stringy(self) -> Stringy {
+        self.to_string().into()
+    }
+
+    pub fn from_stringy(s: Stringy) -> Option<Self> {
+        Self::from_string(s.to_string())
     }
 
     /// Converts a received string into a Version struct

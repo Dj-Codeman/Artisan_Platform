@@ -1,15 +1,16 @@
 use std::io::{self, Write};
 
 use ais_common::git_data::{GitAuth, GitCredentials};
+use dusa_collection_utils::stringy::Stringy;
 use simple_pretty::{halt, pass};
 
-fn prompt_input(prompt: &str) -> String {
+fn prompt_input(prompt: &str) -> Stringy {
     print!("{}", prompt);
     io::stdout().flush().unwrap();
 
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap();
-    input.trim().to_string()
+    input.trim().into()
 }
 
 fn main() {
@@ -30,7 +31,6 @@ fn main() {
             user,
             repo,
             branch,
-            token: "******".to_owned(),
         };
 
         git_creds.add_auth(auth);

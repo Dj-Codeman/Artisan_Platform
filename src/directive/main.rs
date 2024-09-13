@@ -4,7 +4,7 @@
 // We save two hashes to ensure we aren't changing thing when they arent needed. We save a hash before copy. and we save a hash that we modify.
 
 use ais_common::{
-    apache::{create_apache_config, reload_apache},
+    webserver::{create_nginx_config, reload_nginx},
     common::{current_timestamp, AppName, AppStatus, Status},
     directive::{parse_directive, scan_directories},
     messages::report_status,
@@ -112,14 +112,14 @@ async fn executing_directive(directive_path: PathType) -> Result<(), ErrorArrayI
 
     // Checking if we need to reconfigure apache
     if directive.apache {
-        let changed = create_apache_config(&directive, &directive_parent)?;
+        let changed = create_nginx_config(&directive, &directive_parent)?;
         match changed {
             true => {
-                match reload_apache().await {
+                match reload_nginx().await {
                     Ok(b) => {
                         if !b {
-                            eprintln!("My god we killed apache, quick email the admin");
-                            eprintln!("The apache config we rolled out most likely killed apache");
+                            eprintln!("My god we killed nginx, quick email the admin");
+                            eprintln!("The nginx config we rolled out most likely killed nginx");
                         }
                     }
                     Err(e) => return Err(e),
@@ -211,10 +211,23 @@ async fn executing_directive(directive_path: PathType) -> Result<(), ErrorArrayI
 
 #[tokio::main]
 async fn main() {
-    let base_path = "/var/www/ais";
+    let base_path = PathType::Str("/var/www/ais".into());
+
+    if !base_path.exists() {
+        let status = Status {
+            app_name: AppName::Directive,
+            app_status: AppStatus::Warning,
+            timestamp: current_timestamp(),
+            version: Version::get(),
+        };
+
+        if let Err(err) = report_status(status).await {
+            ErrorArray::new(vec![err]).display(true)
+        };
+    }
 
     loop {
-        let directive_paths = match scan_directories(base_path).await {
+        let directive_paths = match scan_directories(&base_path).await {
             Ok(d) => d,
             Err(e) => {
                 // Set the application status to warning in the aggregator as it's running with faults

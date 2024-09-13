@@ -3,6 +3,7 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+use dusa_collection_utils::stringy::Stringy;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -19,7 +20,7 @@ pub struct QueryMessage {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QueryResponse {
-    pub version: String,
+    pub version: Stringy,
     pub app_status: Option<Status>,
     pub all_statuses: Option<HashMap<AppName, Status>>, // New field for all statuses
 }
@@ -34,7 +35,7 @@ pub enum MessageType {
 /// General structure for messages
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GeneralMessage {
-    pub version: String,
+    pub version: Stringy,
     pub msg_type: MessageType,
     pub payload: serde_json::Value,
     pub error: Option<String>, // Simplified for this example
@@ -67,7 +68,7 @@ pub struct Status {
     pub app_name: AppName,
     pub app_status: AppStatus,
     pub timestamp: u64,
-    pub version: String, // Add version field
+    pub version: Stringy, // Add version field
 }
 
 /// Retrieves the current Unix timestamp in seconds.

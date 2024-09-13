@@ -2,7 +2,7 @@ use crate::{
     constants::ARTISANCF,
     dusa_wrapper::{decrypt_text, encrypt_text},
 };
-use dusa_collection_utils::errors::ErrorArrayItem;
+use dusa_collection_utils::{errors::ErrorArrayItem, stringy::Stringy};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -16,16 +16,16 @@ pub struct GitCredentials {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GitAuth {
-    pub user: String,
-    pub repo: String,
-    pub branch: String,
-    pub token: String,
+    pub user: Stringy,
+    pub repo: Stringy,
+    pub branch: Stringy,
+    pub token: Stringy,
 }
 
 // TODO ensure we are creating an Array of GitAuth items to parse in loops
 impl GitCredentials {
     pub fn new() -> Result<Self, ErrorArrayItem> {
-        let encrypted_credentials = Self::read_file(ARTISANCF)?;
+        let encrypted_credentials: Stringy = Self::read_file(ARTISANCF)?.into();
 
         let decrypted_string = decrypt_text(encrypted_credentials)?.replace("\n", "");
 

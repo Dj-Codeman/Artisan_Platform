@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use dusa_collection_utils::errors::{ErrorArrayItem, Errors};
+use dusa_collection_utils::{errors::{ErrorArrayItem, Errors}, stringy::Stringy};
 use std::{
     fmt, io,
     process::{Command, ExitStatus},
@@ -48,7 +48,7 @@ pub struct ProcessInfo {
     pub status: Status,
     pub memory: Memory,
     pub children: SubProcesses,
-    pub timestamp: String,
+    pub timestamp: Stringy,
     pub optional: bool,
 }
 
@@ -233,9 +233,9 @@ impl fmt::Display for SubProcesses {
 }
 
 /// Generates a timestamp string in the format: YYYY-MM-DD HH:MM:SS.
-pub fn timestamp() -> String {
+pub fn timestamp() -> Stringy {
     let now: DateTime<Utc> = Utc::now();
-    now.format("%Y-%m-%d %H:%M:%S").to_string()
+    now.format("%Y-%m-%d %H:%M:%S").to_string().into()
 }
 
 #[cfg(test)]

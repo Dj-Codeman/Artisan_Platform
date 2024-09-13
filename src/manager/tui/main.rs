@@ -17,6 +17,7 @@ use ais_common::{
 };
 use crossterm::event::{self, Event, KeyCode};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
+use dusa_collection_utils::stringy::Stringy;
 use tui::{
     backend::CrosstermBackend,
     layout::Alignment,
@@ -356,7 +357,7 @@ fn handle_git_repo_update(
             user,
             repo,
             branch,
-            token: "******".to_owned(),
+            token: Stringy::new("******"),
         };
 
         git_creds.add_auth(auth);
@@ -396,13 +397,13 @@ fn handle_git_repo_update(
     // Terminal will be redrawn in the main loop after the flag is reset
 }
 
-fn prompt_input(prompt: &str) -> String {
+fn prompt_input(prompt: &str) -> Stringy {
     print!("{}", prompt);
     io::stdout().flush().unwrap();
 
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap();
-    input.trim().to_string()
+    input.trim().into()
 }
 
 fn update_data(

@@ -3,16 +3,16 @@ use std::{
     process::{Command, ExitStatus},
 };
 
-use dusa_collection_utils::{errors::ErrorArrayItem, types::PathType};
+use dusa_collection_utils::{errors::ErrorArrayItem, stringy::Stringy, types::PathType};
 
 /// Function to create a systemd service file dynamically
 pub fn create_node_systemd_service(
     exec_start: &str,
     working_dir: &PathType,
     description: &str,
-) -> Result<String, ErrorArrayItem> {
+) -> Result<Stringy, ErrorArrayItem> {
     // Setting environmental variables depending on the directive file
-    let service_file_content = format!(
+    let service_file_content: Stringy = format!(
         r#"[Unit]
 Description={}
 After=network.target
@@ -33,7 +33,7 @@ WorkingDirectory={}
 WantedBy=multi-user.target
 "#,
         description, exec_start, working_dir
-    );
+    ).into();
 
     Ok(service_file_content)
 }

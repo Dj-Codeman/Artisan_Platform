@@ -312,8 +312,8 @@ fn handle_git_repo_query(
                     repo.clone(),
                     (
                         format!(
-                            "User: {}\nRepo: {}\nBranch: {}\nToken: {}\n---",
-                            auth.user, auth.repo, auth.branch, auth.token
+                            "User: {}\nRepo: {}\nBranch: {}\n",
+                            auth.user, auth.repo, auth.branch
                         ),
                         Color::White,
                     ),
@@ -357,7 +357,6 @@ fn handle_git_repo_update(
             user,
             repo,
             branch,
-            token: Stringy::new("******"),
         };
 
         git_creds.add_auth(auth);
@@ -524,8 +523,8 @@ fn update_git_data(ip_address: &str, git_data: &Arc<Mutex<String>>) {
                 .into_iter()
                 .map(|(_, auth)| {
                     format!(
-                        "User: {}\nRepo: {}\nBranch: {}\nToken: {}\n---",
-                        auth.user, auth.repo, auth.branch, auth.token
+                        "User: {}\nRepo: {}\nBranch: {}\n",
+                        auth.user, auth.repo, auth.branch
                     )
                 })
                 .collect::<Vec<_>>()

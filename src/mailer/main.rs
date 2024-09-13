@@ -2,6 +2,7 @@ use ais_common::dusa_wrapper::decrypt_text;
 use ais_common::mailing::Email;
 use dusa_collection_utils::errors::{ErrorArray, ErrorArrayItem, Errors};
 use dusa_collection_utils::functions::{create_hash, truncate};
+use dusa_collection_utils::stringy::Stringy;
 use lettre::address::AddressError;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
@@ -199,8 +200,8 @@ fn handle_client(
     Ok(())
 }
 
-fn decrypt_received_data(data: &str) -> Result<String, ErrorArrayItem> {
-    decrypt_text(data.to_owned())
+fn decrypt_received_data(data: &str) -> Result<Stringy, ErrorArrayItem> {
+    decrypt_text(data.into())
 }
 
 fn start_server(host: &str, port: u16, emails: Arc<RwLock<Vec<TimedEmail>>>) -> io::Result<()> {

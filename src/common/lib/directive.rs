@@ -54,7 +54,7 @@ impl Directive {
     }
 }
 
-pub async fn scan_directories(base_path: &str) -> Result<Vec<PathType>, ErrorArrayItem> {
+pub async fn scan_directories(base_path: &PathType) -> Result<Vec<PathType>, ErrorArrayItem> {
     let mut directive_paths: Vec<PathType> = Vec::new();
 
     for entry in WalkDir::new(base_path).into_iter().filter_map(|e| e.ok()) {

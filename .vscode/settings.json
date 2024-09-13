@@ -9,6 +9,7 @@
         "serde",
         "SERVERADDRESS",
         "timeframe",
+        "WEBSERVER",
         "webuser"
     ]
 }

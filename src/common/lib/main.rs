@@ -1,4 +1,4 @@
-pub mod apache;
+pub mod webserver;
 pub mod common;
 pub mod constants;
 pub mod directive;

@@ -13,7 +13,7 @@ pub struct Directive {
     // pub version: crate::version::Version,
     pub url: Stringy,
     pub track_directory: bool, // Triggering service restart if dir changes
-    pub apache: bool,          // This will determine if a new apache config is needed
+    pub webserver: bool,          // This will determine if a new apache config is needed
     pub port: u16,
     pub php_fpm_version: Option<Stringy>, // Add this field to specify PHP-FPM version
     pub nodejs_bool: bool,
@@ -36,7 +36,7 @@ impl Directive {
             track_directory: true, 
             // Weather or not to auto configure a apache/nginx
             // config file.
-            apache: false,
+            webserver: false,
             // ! CURRENTLY ONLY WORKS ON APACHE
             // Defines what port the application will listen on
             // ensures ufw has allowed the port for communication 

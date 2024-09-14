@@ -4,14 +4,7 @@
 // We save two hashes to ensure we aren't changing thing when they arent needed. We save a hash before copy. and we save a hash that we modify.
 
 use ais_common::{
-    webserver::{create_nginx_config, reload_nginx},
-    common::{current_timestamp, AppName, AppStatus, Status},
-    directive::{parse_directive, scan_directories},
-    messages::report_status,
-    monitor::{create_monitoring_script, create_monitoring_service, MONITOR_DIR},
-    node::{create_node_systemd_service, run_npm_install},
-    systemd::{enable_now, reload_systemd_daemon},
-    version::Version,
+    common::{current_timestamp, AppName, AppStatus, Status}, directive::{parse_directive, scan_directories}, messages::report_status, monitor::{create_monitoring_script, create_monitoring_service, MONITOR_DIR}, node::{check_and_install_node_version, create_node_systemd_service, run_npm_install}, systemd::{enable_now, reload_systemd_daemon}, version::Version, webserver::{create_nginx_config, reload_nginx}
 };
 use dusa_collection_utils::{
     errors::{ErrorArray, ErrorArrayItem}, functions::{create_hash, make_file, open_file, truncate}, stringy::Stringy, types::{ClonePath, PathType}
@@ -111,7 +104,7 @@ async fn executing_directive(directive_path: PathType) -> Result<(), ErrorArrayI
     notice(&format!("Executing directive: {}", directive_parent));
 
     // Checking if we need to reconfigure apache
-    if directive.apache {
+    if directive.webserver {
         let changed = create_nginx_config(&directive, &directive_parent)?;
         match changed {
             true => {
@@ -132,12 +125,12 @@ async fn executing_directive(directive_path: PathType) -> Result<(), ErrorArrayI
 
     // Checking if the project is a node thing.
     if directive.nodejs_bool {
-        let _version = match directive.nodejs_version {
+        let version = match directive.nodejs_version {
             Some(d) => d,
-            None => Stringy::from("22"),
+            None => Stringy::from("22.6.0"),
         };
 
-        // TODO add check with nvm to ensure the correct version is installed.
+        check_and_install_node_version(version)?;
 
         // build application
         if let Ok(_) = run_npm_install(&directive_parent) {
@@ -149,20 +142,29 @@ async fn executing_directive(directive_path: PathType) -> Result<(), ErrorArrayI
             ));
         };
 
-        // TODO MITOBYTE HAS THE WRONG VERSION of directive.ais
-        // // create system d service file
-        // let exec_start = match directive.nodejs_exec_command {
-        //     Some(d) => d,
-        //     None => format!("/usr/bin/npm dev run"),
-        // };
 
-        let exec_start = format!("/usr/bin/npm run dev");
+        // Determining the pre_exec line
+        fn pre_exec(pre: Option<Stringy>) -> Stringy {
+            match pre {
+                Some(d) =>{
+                    const SYSTEMD: &str = "ExecStartPre=";
+                    let pre_string = format!("{}{}", SYSTEMD, d);
+                    Stringy::new(&pre_string)
+                },
+                None => Stringy::new(""),
+            }
+        }
+
+        // Determining the default exec command
+        let exec_start: Stringy = directive.nodejs_exec_command.unwrap_or(Stringy::new("npm dev run"));
+
+        let pre_command: Stringy = pre_exec(directive.nodejs_pre_exec_command); 
 
         let description: &str = &format!("Ais project id {}", &directive_parent);
 
         // Create the systemd service file content
         let service_file_data =
-            create_node_systemd_service(&exec_start, &directive_parent, description)?;
+            create_node_systemd_service(&exec_start, &pre_command, &directive_parent, description)?;
 
         // Write the service file
         let service_id: String = directive_parent.to_string().replace("/var/www/ais/", "");
@@ -287,6 +289,19 @@ async fn main() {
                         ErrorArray::new(vec![err]).display(false)
                     }
                     return;
+                }
+            } else {
+                // Check if dependencies need to be updated
+                match parse_directive(&directive_path).await {
+                    Ok(d) => {
+                        if d.nodejs_bool {
+
+                        }
+                        // Check if other project types need updates below
+                    },
+                    Err(e) => {
+                        ErrorArray::new(vec![e]).display(false);
+                    },
                 }
             }
         }
